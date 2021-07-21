@@ -1,0 +1,32 @@
+.svgContainer {
+    z-index: 999;
+    width: 60%;
+  }
+  
+  .selection {
+    position:absolute;
+    top: 1%;
+    right:0;
+    font-size: 20px;
+    width: 200px;
+    z-index: 99;
+    overflow: auto
+  }
+  
+  
+  
+  @media print {
+    .selection {
+       visibility: hidden;
+    }
+    
+    .scale {
+      visibility: hidden;
+    }
+  
+    .svgContainer {
+      transform: scale(.8);
+      margin-left: -10%;
+    }
+  
+  }

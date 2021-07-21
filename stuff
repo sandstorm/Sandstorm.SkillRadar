@@ -1,0 +1,10 @@
+keyListener: function (event) {
+
+    let key_state = (event.type == "keydown") ? true : false;
+    case 222: //test ä
+        test();
+        break
+}
+
+window.addEventListener("keydown", controller.keyListener);
+window.addEventListener("keyup", controller.keyListener);
