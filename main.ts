@@ -165,10 +165,7 @@ window.addEventListener('load', () => {
 
 
 function render(n: number) {
-    console.log('render');
-    
     const data = diagramValues[n]
-    console.log(diagramValues);
     
     const oldSVG = document.getElementById('svg'+ n.toString());
     if (oldSVG) oldSVG.remove();
