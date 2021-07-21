@@ -8,16 +8,17 @@ let numberFeatures: number = 10;
 let diagramValues = [];
 let features = ["Softwarearchitektur", "Frontendentwicklung", "Backendentwicklung", "Design/UX", "Infrastruktur", "Operations", "Strategie", "Projektmanagement", "Marketing", "Social Consulting"];
 let diagramTitles = ["Skills", "Interests"];
-const alphabet = "abcdefghijklmnopqrstuvwxyzäöü";
+const alphabet = "abcdefghijklmnopqrstuvwxyzäöüß";
+
 
 const radialScale = d3.scaleLinear()
     .domain([0, 10])
     .range([0, 250]);
 
 
-function updateData(data, feature: string, k: number) {
-    data[feature] = k * circleRadius;
-    render(diagramValues[0]);
+function updateData(feature: string, k: number, n: number) {
+    diagramValues[n][feature] = k * circleRadius;
+    render(n);
 }
 
 function angleToCoordinate(angle, value) {
@@ -141,32 +142,41 @@ window.addEventListener('load', () => {
         svgSize = circleRadius * 400;
         svgMid = svgSize / 2;
 
-        render(diagramValues[0]);
+        render(0);
+        render(1);
     })
     getValues();
 
-    let point = {}
-    features.forEach(f => point[f] = 0);
-    diagramValues.push(point);
-    features.forEach(f => point[f] = 0);
-    diagramValues.push(point);
+    
+    const reducer = (acc, current) => ({
+        ...acc,
+        [current]: 0
+    })
+
+    diagramValues.push(features.reduce(reducer, {}))
+    diagramValues.push(features.reduce(reducer, {}))
 
     document.getElementById('addCategory').onclick = addCategory;
 
     showPreSelected();
-    render(diagramValues[0]);
-    render(diagramValues[1]);
+    render(0);
+    render(1);
 })
 
 
 
-function render(data: Array<Object>) {
-    const oldSVG = document.getElementById('svg');
+function render(n: number) {
+    console.log('render');
+    
+    const data = diagramValues[n]
+    console.log(diagramValues);
+    
+    const oldSVG = document.getElementById('svg'+ n.toString());
     if (oldSVG) oldSVG.remove();
-    const svg = d3.select(document.getElementById("svgContainer")).append("svg")
+    const svg = d3.select(document.getElementById("svgContainer"+ n.toString())).append("svg")
         .attr("width", svgSize)
         .attr("height", svgSize)
-        .attr("id", "svg")
+        .attr("id", "svg"+n)
 
     for (let i: number = 0; i <= levels; i++) {
         const pos = i * circleRadius;
@@ -188,7 +198,7 @@ function render(data: Array<Object>) {
                 .attr("text-anchor", "middle")
                 .attr("x", svgMid)
                 .attr("y", svgMid - radialScale(pos) - radialScale(pos) * 0.3)
-                .text(diagramTitles[0])
+                .text(diagramTitles[n])
                 .attr("font-weight", function (d, i) { return i * 100 + 100; })
                 .attr("text-decoration", "underline")
                 .style("font-size", 10 * circleRadius + "px")
@@ -222,16 +232,14 @@ function render(data: Array<Object>) {
 
         for (let k = 1; k <= levels; k++) {
             const pointCoordinate = angleToCoordinate(angle, k * circleRadius)
-            const id = i.toString() + k.toString();
-
+            
             const point = svg.append("circle")
                 .attr("cx", pointCoordinate.x)
                 .attr("cy", pointCoordinate.y)
                 .attr("fill", "black")
                 .attr("stroke", "grey")
                 .attr("r", radialScale(pointSize))
-                .attr("id", id)
-                .on('click', () => updateData(data, ft_name, k))
+                .on('click', () => updateData(ft_name, k, n))
         }
 
     }

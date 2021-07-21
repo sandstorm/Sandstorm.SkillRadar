@@ -8,3 +8,11 @@ keyListener: function (event) {
 
 window.addEventListener("keydown", controller.keyListener);
 window.addEventListener("keyup", controller.keyListener);
+
+
+
+
+diagramValues => json
+json => url encode
+=================
+url lesen => url decoden => json in object umwandeln => state

@@ -1,3 +1,14 @@
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var circleRadius = 3;
 var pointSize = circleRadius * 0.1;
 var svgSize = circleRadius * 400;
@@ -7,13 +18,13 @@ var numberFeatures = 10;
 var diagramValues = [];
 var features = ["Softwarearchitektur", "Frontendentwicklung", "Backendentwicklung", "Design/UX", "Infrastruktur", "Operations", "Strategie", "Projektmanagement", "Marketing", "Social Consulting"];
 var diagramTitles = ["Skills", "Interests"];
-var alphabet = "abcdefghijklmnopqrstuvwxyzäöü";
+var alphabet = "abcdefghijklmnopqrstuvwxyzäöüß";
 var radialScale = d3.scaleLinear()
     .domain([0, 10])
     .range([0, 250]);
-function updateData(data, feature, k) {
-    data[feature] = k * circleRadius;
-    render(diagramValues[0]);
+function updateData(feature, k, n) {
+    diagramValues[n][feature] = k * circleRadius;
+    render(n);
 }
 function angleToCoordinate(angle, value) {
     var x = Math.cos(angle) * radialScale(value);
@@ -129,27 +140,32 @@ window.addEventListener('load', function () {
         pointSize = circleRadius * 0.1;
         svgSize = circleRadius * 400;
         svgMid = svgSize / 2;
-        render(diagramValues[0]);
+        render(0);
+        render(1);
     });
     getValues();
-    var point = {};
-    features.forEach(function (f) { return point[f] = 0; });
-    diagramValues.push(point);
-    features.forEach(function (f) { return point[f] = 0; });
-    diagramValues.push(point);
+    var reducer = function (acc, current) {
+        var _a;
+        return (__assign(__assign({}, acc), (_a = {}, _a[current] = 0, _a)));
+    };
+    diagramValues.push(features.reduce(reducer, {}));
+    diagramValues.push(features.reduce(reducer, {}));
     document.getElementById('addCategory').onclick = addCategory;
     showPreSelected();
-    render(diagramValues[0]);
-    render(diagramValues[1]);
+    render(0);
+    render(1);
 });
-function render(data) {
-    var oldSVG = document.getElementById('svg');
+function render(n) {
+    console.log('render');
+    var data = diagramValues[n];
+    console.log(diagramValues);
+    var oldSVG = document.getElementById('svg' + n.toString());
     if (oldSVG)
         oldSVG.remove();
-    var svg = d3.select(document.getElementById("svgContainer")).append("svg")
+    var svg = d3.select(document.getElementById("svgContainer" + n.toString())).append("svg")
         .attr("width", svgSize)
         .attr("height", svgSize)
-        .attr("id", "svg");
+        .attr("id", "svg" + n);
     for (var i = 0; i <= levels; i++) {
         var pos = i * circleRadius;
         svg.append("circle")
@@ -168,7 +184,7 @@ function render(data) {
                 .attr("text-anchor", "middle")
                 .attr("x", svgMid)
                 .attr("y", svgMid - radialScale(pos) - radialScale(pos) * 0.3)
-                .text(diagramTitles[0])
+                .text(diagramTitles[n])
                 .attr("font-weight", function (d, i) { return i * 100 + 100; })
                 .attr("text-decoration", "underline")
                 .style("font-size", 10 * circleRadius + "px");
@@ -197,15 +213,13 @@ function render(data) {
             label.attr("text-anchor", "end");
         var _loop_3 = function (k) {
             var pointCoordinate = angleToCoordinate(angle, k * circleRadius);
-            var id = i.toString() + k.toString();
             var point = svg.append("circle")
                 .attr("cx", pointCoordinate.x)
                 .attr("cy", pointCoordinate.y)
                 .attr("fill", "black")
                 .attr("stroke", "grey")
                 .attr("r", radialScale(pointSize))
-                .attr("id", id)
-                .on('click', function () { return updateData(data, ft_name, k); });
+                .on('click', function () { return updateData(ft_name, k, n); });
         };
         for (var k = 1; k <= levels; k++) {
             _loop_3(k);
