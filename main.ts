@@ -6,7 +6,6 @@ const levels: number = 5;
 let numberFeatures: number = 10;
 
 let data = [];
-let secondData = [];
 let features = ["Softwarearchitektur", "Frontendentwicklung", "Backendentwicklung", "Design/UX", "Infrastruktur", "Operations", "Strategie", "Projektmanagement", "Marketing", "Social Consulting"];
 let diagramTitles = ["Skills", "Interests"];
 const alphabet = "abcdefghijklmnopqrstuvwxyzäöü";
@@ -16,10 +15,9 @@ const radialScale = d3.scaleLinear()
     .range([0, 250]);
 
 
-function updateData(feature: string, k: number, numDiagram: number) {
-    if (numDiagram == 1) data[0][feature] = k * circleRadius;
-    if (numDiagram == 2) secondData[0][feature] = k * circleRadius;
-    render(data, secondData);
+function updateData(feature: string, k: number) {
+    data[0][feature] = k * circleRadius;
+    render(data);
 }
 
 function angleToCoordinate(angle, value) {
@@ -142,122 +140,117 @@ window.addEventListener('load', () => {
         svgSize = circleRadius * 400;
         svgMid = svgSize / 2;
 
-        render(data, secondData);
+        render(data);
     })
     getValues();
 
     let point = {}
     features.forEach(f => point[f] = 0);
     data.push(point);
-    secondData.push(point);
 
     document.getElementById('addCategory').onclick = addCategory;
 
     showPreSelected();
-    render(data, secondData);
+    render(data);
 })
 
 
 
-function render(data: object, secondData: object) {
-    for (let n = 1; n < 3; n++) {
-        if (n == 2) data = secondData;
-        const oldSVG = document.getElementById('svg' + n);
-        if (oldSVG) oldSVG.remove();
-        const svg = d3.select(document.getElementById("svgContainer" + n)).append("svg")
-            .attr("width", svgSize)
-            .attr("height", svgSize)
-            .attr("id", "svg" + n)
+function render(data: object) {
+    const oldSVG = document.getElementById('svg');
+    if (oldSVG) oldSVG.remove();
+    const svg = d3.select(document.getElementById("svgContainer")).append("svg")
+        .attr("width", svgSize)
+        .attr("height", svgSize)
+        .attr("id", "svg")
 
-        for (let i: number = 0; i <= levels; i++) {
-            const pos = i * circleRadius;
-            svg.append("circle")
-                .attr("cx", svgMid)
-                .attr("cy", svgMid)
-                .attr("fill", "none")
-                .attr("stroke", "grey")
-                .attr("r", radialScale(pos))
+    for (let i: number = 0; i <= levels; i++) {
+        const pos = i * circleRadius;
+        svg.append("circle")
+            .attr("cx", svgMid)
+            .attr("cy", svgMid)
+            .attr("fill", "none")
+            .attr("stroke", "grey")
+            .attr("r", radialScale(pos))
 
+        svg.append("text")
+            .attr("x", svgMid + 10)
+            .attr("y", svgMid - radialScale(pos) - circleRadius * 2.5)
+            .style("font-size", circleRadius * 5 + "px")
+            .text(i.toString())
+
+        if (i == levels) {
             svg.append("text")
-                .attr("x", svgMid + 10)
-                .attr("y", svgMid - radialScale(pos) - circleRadius * 2.5)
-                .style("font-size", circleRadius * 5 + "px")
-                .text(i.toString())
-
-            if (i == levels) {
-                svg.append("text")
-                    .attr("text-anchor", "middle")
-                    .attr("x", svgMid)
-                    .attr("y", svgMid - radialScale(pos) - radialScale(pos) * 0.3)
-                    .text(diagramTitles[n - 1])
-                    .attr("font-weight", function (d, i) { return i * 100 + 100; })
-                    .attr("text-decoration", "underline")
-                    .style("font-size", 10 * circleRadius + "px")
-            }
-        }
-
-
-        for (let i: number = 0; i < features.length; i++) {
-            const ft_name = features[i];
-            const angle = (Math.PI / 2) + (2 * Math.PI * i / features.length);
-            const line_coordinate = angleToCoordinate(angle, circleRadius * 5);
-            const label_coordinate = angleToCoordinate(angle, circleRadius * 5.5);
-
-            //draw axis line
-            svg.append("line")
-                .attr("x1", svgMid)
-                .attr("y1", svgMid)
-                .attr("x2", line_coordinate.x)
-                .attr("y2", line_coordinate.y)
-                .attr("stroke", "black");
-
-            //draw axis label
-            let label = svg.append("text")
-                .attr("x", label_coordinate.x)
-                .attr("y", label_coordinate.y)
-                .text(ft_name)
+                .attr("text-anchor", "middle")
+                .attr("x", svgMid)
+                .attr("y", svgMid - radialScale(pos) - radialScale(pos) * 0.3)
+                .text(diagramTitles[0])
+                .attr("font-weight", function (d, i) { return i * 100 + 100; })
                 .attr("text-decoration", "underline")
-                .style("font-size", circleRadius * 6 + "px")
-            if (i == 0 || i == features.length / 2) label.attr("text-anchor", "middle");
-            if (i < features.length / 2 && i > 0) label.attr("text-anchor", "end");
+                .style("font-size", 10 * circleRadius + "px")
+        }
+    }
 
-            for (let k = 1; k <= levels; k++) {
-                const pointCoordinate = angleToCoordinate(angle, k * circleRadius)
-                const id = i.toString() + k.toString();
 
-                const point = svg.append("circle")
-                    .attr("cx", pointCoordinate.x)
-                    .attr("cy", pointCoordinate.y)
-                    .attr("fill", "black")
-                    .attr("stroke", "grey")
-                    .attr("r", radialScale(pointSize))
-                    .attr("id", id)
-                if (n == 1) point.on('click', () => updateData(ft_name, k, n))
-                if (n == 2) point.on('click', () => updateData(ft_name, k, n))
-            }
+    for (let i: number = 0; i < features.length; i++) {
+        const ft_name = features[i];
+        const angle = (Math.PI / 2) + (2 * Math.PI * i / features.length);
+        const line_coordinate = angleToCoordinate(angle, circleRadius * 5);
+        const label_coordinate = angleToCoordinate(angle, circleRadius * 5.5);
 
+        //draw axis line
+        svg.append("line")
+            .attr("x1", svgMid)
+            .attr("y1", svgMid)
+            .attr("x2", line_coordinate.x)
+            .attr("y2", line_coordinate.y)
+            .attr("stroke", "black");
+
+        //draw axis label
+        let label = svg.append("text")
+            .attr("x", label_coordinate.x)
+            .attr("y", label_coordinate.y)
+            .text(ft_name)
+            .attr("text-decoration", "underline")
+            .style("font-size", circleRadius * 6 + "px")
+        if (i == 0 || i == features.length / 2) label.attr("text-anchor", "middle");
+        if (i < features.length / 2 && i > 0) label.attr("text-anchor", "end");
+
+        for (let k = 1; k <= levels; k++) {
+            const pointCoordinate = angleToCoordinate(angle, k * circleRadius)
+            const id = i.toString() + k.toString();
+
+            const point = svg.append("circle")
+                .attr("cx", pointCoordinate.x)
+                .attr("cy", pointCoordinate.y)
+                .attr("fill", "black")
+                .attr("stroke", "grey")
+                .attr("r", radialScale(pointSize))
+                .attr("id", id)
+                .on('click', () => updateData(ft_name, k))
         }
 
-        let line = d3.line()
-            .x(d => d.x)
-            .y(d => d.y);
+    }
 
-        for (let i = 0; i < data.length; i++) {
-            let d = data[i];
+    let line = d3.line()
+        .x(d => d.x)
+        .y(d => d.y);
 
-            let color = "navy";
-            let coordinates = getPathCoordinates(d);
+    for (let i = 0; i < data.length; i++) {
+        let d = data[i];
 
-            svg.append("path")
-                .datum(coordinates)
-                .attr("d", line)
-                .attr("stroke-width", 3)
-                .attr("stroke", color)
-                .attr("fill", color)
-                .attr("stroke-opacity", 1)
-                .attr("opacity", 0.5)
-                .attr("style", "pointer-events: none;")
-        }
+        let color = "navy";
+        let coordinates = getPathCoordinates(d);
+
+        svg.append("path")
+            .datum(coordinates)
+            .attr("d", line)
+            .attr("stroke-width", 3)
+            .attr("stroke", color)
+            .attr("fill", color)
+            .attr("stroke-opacity", 1)
+            .attr("opacity", 0.5)
+            .attr("style", "pointer-events: none;")
     }
 }
 

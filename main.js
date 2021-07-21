@@ -5,19 +5,15 @@ var svgMid = svgSize / 2;
 var levels = 5;
 var numberFeatures = 10;
 var data = [];
-var secondData = [];
 var features = ["Softwarearchitektur", "Frontendentwicklung", "Backendentwicklung", "Design/UX", "Infrastruktur", "Operations", "Strategie", "Projektmanagement", "Marketing", "Social Consulting"];
 var diagramTitles = ["Skills", "Interests"];
 var alphabet = "abcdefghijklmnopqrstuvwxyzäöü";
 var radialScale = d3.scaleLinear()
     .domain([0, 10])
     .range([0, 250]);
-function updateData(feature, k, numDiagram) {
-    if (numDiagram == 1)
-        data[0][feature] = k * circleRadius;
-    if (numDiagram == 2)
-        secondData[0][feature] = k * circleRadius;
-    render(data, secondData);
+function updateData(feature, k) {
+    data[0][feature] = k * circleRadius;
+    render(data);
 }
 function angleToCoordinate(angle, value) {
     var x = Math.cos(angle) * radialScale(value);
@@ -132,115 +128,104 @@ window.addEventListener('load', function () {
         pointSize = circleRadius * 0.1;
         svgSize = circleRadius * 400;
         svgMid = svgSize / 2;
-        render(data, secondData);
+        render(data);
     });
     getValues();
     var point = {};
     features.forEach(function (f) { return point[f] = 0; });
     data.push(point);
-    secondData.push(point);
     document.getElementById('addCategory').onclick = addCategory;
     showPreSelected();
-    render(data, secondData);
+    render(data);
 });
-function render(data, secondData) {
-    var _loop_2 = function (n) {
-        if (n == 2)
-            data = secondData;
-        var oldSVG = document.getElementById('svg' + n);
-        if (oldSVG)
-            oldSVG.remove();
-        var svg = d3.select(document.getElementById("svgContainer" + n)).append("svg")
-            .attr("width", svgSize)
-            .attr("height", svgSize)
-            .attr("id", "svg" + n);
-        for (var i = 0; i <= levels; i++) {
-            var pos = i * circleRadius;
-            svg.append("circle")
-                .attr("cx", svgMid)
-                .attr("cy", svgMid)
-                .attr("fill", "none")
-                .attr("stroke", "grey")
-                .attr("r", radialScale(pos));
+function render(data) {
+    var oldSVG = document.getElementById('svg');
+    if (oldSVG)
+        oldSVG.remove();
+    var svg = d3.select(document.getElementById("svgContainer")).append("svg")
+        .attr("width", svgSize)
+        .attr("height", svgSize)
+        .attr("id", "svg");
+    for (var i = 0; i <= levels; i++) {
+        var pos = i * circleRadius;
+        svg.append("circle")
+            .attr("cx", svgMid)
+            .attr("cy", svgMid)
+            .attr("fill", "none")
+            .attr("stroke", "grey")
+            .attr("r", radialScale(pos));
+        svg.append("text")
+            .attr("x", svgMid + 10)
+            .attr("y", svgMid - radialScale(pos) - circleRadius * 2.5)
+            .style("font-size", circleRadius * 5 + "px")
+            .text(i.toString());
+        if (i == levels) {
             svg.append("text")
-                .attr("x", svgMid + 10)
-                .attr("y", svgMid - radialScale(pos) - circleRadius * 2.5)
-                .style("font-size", circleRadius * 5 + "px")
-                .text(i.toString());
-            if (i == levels) {
-                svg.append("text")
-                    .attr("text-anchor", "middle")
-                    .attr("x", svgMid)
-                    .attr("y", svgMid - radialScale(pos) - radialScale(pos) * 0.3)
-                    .text(diagramTitles[n - 1])
-                    .attr("font-weight", function (d, i) { return i * 100 + 100; })
-                    .attr("text-decoration", "underline")
-                    .style("font-size", 10 * circleRadius + "px");
-            }
-        }
-        var _loop_3 = function (i) {
-            var ft_name = features[i];
-            var angle = (Math.PI / 2) + (2 * Math.PI * i / features.length);
-            var line_coordinate = angleToCoordinate(angle, circleRadius * 5);
-            var label_coordinate = angleToCoordinate(angle, circleRadius * 5.5);
-            svg.append("line")
-                .attr("x1", svgMid)
-                .attr("y1", svgMid)
-                .attr("x2", line_coordinate.x)
-                .attr("y2", line_coordinate.y)
-                .attr("stroke", "black");
-            var label = svg.append("text")
-                .attr("x", label_coordinate.x)
-                .attr("y", label_coordinate.y)
-                .text(ft_name)
+                .attr("text-anchor", "middle")
+                .attr("x", svgMid)
+                .attr("y", svgMid - radialScale(pos) - radialScale(pos) * 0.3)
+                .text(diagramTitles[0])
+                .attr("font-weight", function (d, i) { return i * 100 + 100; })
                 .attr("text-decoration", "underline")
-                .style("font-size", circleRadius * 6 + "px");
-            if (i == 0 || i == features.length / 2)
-                label.attr("text-anchor", "middle");
-            if (i < features.length / 2 && i > 0)
-                label.attr("text-anchor", "end");
-            var _loop_4 = function (k) {
-                var pointCoordinate = angleToCoordinate(angle, k * circleRadius);
-                var id = i.toString() + k.toString();
-                var point = svg.append("circle")
-                    .attr("cx", pointCoordinate.x)
-                    .attr("cy", pointCoordinate.y)
-                    .attr("fill", "black")
-                    .attr("stroke", "grey")
-                    .attr("r", radialScale(pointSize))
-                    .attr("id", id);
-                if (n == 1)
-                    point.on('click', function () { return updateData(ft_name, k, n); });
-                if (n == 2)
-                    point.on('click', function () { return updateData(ft_name, k, n); });
-            };
-            for (var k = 1; k <= levels; k++) {
-                _loop_4(k);
-            }
-        };
-        for (var i = 0; i < features.length; i++) {
-            _loop_3(i);
+                .style("font-size", 10 * circleRadius + "px");
         }
-        var line = d3.line()
-            .x(function (d) { return d.x; })
-            .y(function (d) { return d.y; });
-        for (var i = 0; i < data.length; i++) {
-            var d = data[i];
-            var color = "navy";
-            var coordinates = getPathCoordinates(d);
-            svg.append("path")
-                .datum(coordinates)
-                .attr("d", line)
-                .attr("stroke-width", 3)
-                .attr("stroke", color)
-                .attr("fill", color)
-                .attr("stroke-opacity", 1)
-                .attr("opacity", 0.5)
-                .attr("style", "pointer-events: none;");
+    }
+    var _loop_2 = function (i) {
+        var ft_name = features[i];
+        var angle = (Math.PI / 2) + (2 * Math.PI * i / features.length);
+        var line_coordinate = angleToCoordinate(angle, circleRadius * 5);
+        var label_coordinate = angleToCoordinate(angle, circleRadius * 5.5);
+        svg.append("line")
+            .attr("x1", svgMid)
+            .attr("y1", svgMid)
+            .attr("x2", line_coordinate.x)
+            .attr("y2", line_coordinate.y)
+            .attr("stroke", "black");
+        var label = svg.append("text")
+            .attr("x", label_coordinate.x)
+            .attr("y", label_coordinate.y)
+            .text(ft_name)
+            .attr("text-decoration", "underline")
+            .style("font-size", circleRadius * 6 + "px");
+        if (i == 0 || i == features.length / 2)
+            label.attr("text-anchor", "middle");
+        if (i < features.length / 2 && i > 0)
+            label.attr("text-anchor", "end");
+        var _loop_3 = function (k) {
+            var pointCoordinate = angleToCoordinate(angle, k * circleRadius);
+            var id = i.toString() + k.toString();
+            var point = svg.append("circle")
+                .attr("cx", pointCoordinate.x)
+                .attr("cy", pointCoordinate.y)
+                .attr("fill", "black")
+                .attr("stroke", "grey")
+                .attr("r", radialScale(pointSize))
+                .attr("id", id)
+                .on('click', function () { return updateData(ft_name, k); });
+        };
+        for (var k = 1; k <= levels; k++) {
+            _loop_3(k);
         }
     };
-    for (var n = 1; n < 3; n++) {
-        _loop_2(n);
+    for (var i = 0; i < features.length; i++) {
+        _loop_2(i);
+    }
+    var line = d3.line()
+        .x(function (d) { return d.x; })
+        .y(function (d) { return d.y; });
+    for (var i = 0; i < data.length; i++) {
+        var d = data[i];
+        var color = "navy";
+        var coordinates = getPathCoordinates(d);
+        svg.append("path")
+            .datum(coordinates)
+            .attr("d", line)
+            .attr("stroke-width", 3)
+            .attr("stroke", color)
+            .attr("fill", color)
+            .attr("stroke-opacity", 1)
+            .attr("opacity", 0.5)
+            .attr("style", "pointer-events: none;");
     }
 }
 function keyListener(event) {
