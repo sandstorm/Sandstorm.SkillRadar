@@ -8,7 +8,6 @@ let numberFeatures: number = 10;
 let diagramValues = [];
 let features = ["Softwarearchitektur", "Frontendentwicklung", "Backendentwicklung", "Design/UX", "Infrastruktur", "Operations", "Strategie", "Projektmanagement", "Marketing", "Social Consulting"];
 let diagramTitles = ["Skills", "Interests"];
-const alphabet = "abcdefghijklmnopqrstuvwxyzäöüß";
 
 
 const radialScale = d3.scaleLinear()

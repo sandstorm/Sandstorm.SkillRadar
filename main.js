@@ -18,7 +18,6 @@ var numberFeatures = 10;
 var diagramValues = [];
 var features = ["Softwarearchitektur", "Frontendentwicklung", "Backendentwicklung", "Design/UX", "Infrastruktur", "Operations", "Strategie", "Projektmanagement", "Marketing", "Social Consulting"];
 var diagramTitles = ["Skills", "Interests"];
-var alphabet = "abcdefghijklmnopqrstuvwxyzäöüß";
 var radialScale = d3.scaleLinear()
     .domain([0, 10])
     .range([0, 250]);
