@@ -5,7 +5,7 @@ let svgMid: number = svgSize / 2;
 const levels: number = 5;
 let numberFeatures: number = 10;
 
-let data = [];
+let diagramValues = [];
 let features = ["Softwarearchitektur", "Frontendentwicklung", "Backendentwicklung", "Design/UX", "Infrastruktur", "Operations", "Strategie", "Projektmanagement", "Marketing", "Social Consulting"];
 let diagramTitles = ["Skills", "Interests"];
 const alphabet = "abcdefghijklmnopqrstuvwxyzäöü";
@@ -15,9 +15,9 @@ const radialScale = d3.scaleLinear()
     .range([0, 250]);
 
 
-function updateData(feature: string, k: number) {
-    data[0][feature] = k * circleRadius;
-    render(data);
+function updateData(data, feature: string, k: number) {
+    data[feature] = k * circleRadius;
+    render(diagramValues[0]);
 }
 
 function angleToCoordinate(angle, value) {
@@ -120,12 +120,13 @@ function isolateGetParam(urlGetValues, i) {
     const getValue = urlGetValues[i].split("=");
     const plusCheck = getValue[1].split("+");
     const slashCheck = getValue[1].split("%2F");
+    let value: string;
     if (plusCheck[1]) {
-        const value = plusCheck[0] + " " + plusCheck[1];
+        value = plusCheck[0] + " " + plusCheck[1];
     } else if (slashCheck[1]) {
-        const value = slashCheck[0] + "/" + slashCheck[1];
+        value = slashCheck[0] + "/" + slashCheck[1];
     } else {
-        const value = getValue[1];
+        value = getValue[1];
     }
     return (value);
 }
@@ -140,23 +141,26 @@ window.addEventListener('load', () => {
         svgSize = circleRadius * 400;
         svgMid = svgSize / 2;
 
-        render(data);
+        render(diagramValues[0]);
     })
     getValues();
 
     let point = {}
     features.forEach(f => point[f] = 0);
-    data.push(point);
+    diagramValues.push(point);
+    features.forEach(f => point[f] = 0);
+    diagramValues.push(point);
 
     document.getElementById('addCategory').onclick = addCategory;
 
     showPreSelected();
-    render(data);
+    render(diagramValues[0]);
+    render(diagramValues[1]);
 })
 
 
 
-function render(data: object) {
+function render(data: Array<Object>) {
     const oldSVG = document.getElementById('svg');
     if (oldSVG) oldSVG.remove();
     const svg = d3.select(document.getElementById("svgContainer")).append("svg")
@@ -227,7 +231,7 @@ function render(data: object) {
                 .attr("stroke", "grey")
                 .attr("r", radialScale(pointSize))
                 .attr("id", id)
-                .on('click', () => updateData(ft_name, k))
+                .on('click', () => updateData(data, ft_name, k))
         }
 
     }
@@ -236,8 +240,7 @@ function render(data: object) {
         .x(d => d.x)
         .y(d => d.y);
 
-    for (let i = 0; i < data.length; i++) {
-        let d = data[i];
+        let d = data;
 
         let color = "navy";
         let coordinates = getPathCoordinates(d);
@@ -251,7 +254,7 @@ function render(data: object) {
             .attr("stroke-opacity", 1)
             .attr("opacity", 0.5)
             .attr("style", "pointer-events: none;")
-    }
+
 }
 
 
@@ -265,7 +268,7 @@ function keyListener(event) {
     }
 }
 function test() {
-    console.log(data, secondData)
+    console.log(diagramValues)
 }
 window.addEventListener("keydown", keyListener);
 window.addEventListener("keyup", keyListener);

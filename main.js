@@ -4,16 +4,16 @@ var svgSize = circleRadius * 400;
 var svgMid = svgSize / 2;
 var levels = 5;
 var numberFeatures = 10;
-var data = [];
+var diagramValues = [];
 var features = ["Softwarearchitektur", "Frontendentwicklung", "Backendentwicklung", "Design/UX", "Infrastruktur", "Operations", "Strategie", "Projektmanagement", "Marketing", "Social Consulting"];
 var diagramTitles = ["Skills", "Interests"];
 var alphabet = "abcdefghijklmnopqrstuvwxyzäöü";
 var radialScale = d3.scaleLinear()
     .domain([0, 10])
     .range([0, 250]);
-function updateData(feature, k) {
-    data[0][feature] = k * circleRadius;
-    render(data);
+function updateData(data, feature, k) {
+    data[feature] = k * circleRadius;
+    render(diagramValues[0]);
 }
 function angleToCoordinate(angle, value) {
     var x = Math.cos(angle) * radialScale(value);
@@ -111,14 +111,15 @@ function isolateGetParam(urlGetValues, i) {
     var getValue = urlGetValues[i].split("=");
     var plusCheck = getValue[1].split("+");
     var slashCheck = getValue[1].split("%2F");
+    var value;
     if (plusCheck[1]) {
-        var value = plusCheck[0] + " " + plusCheck[1];
+        value = plusCheck[0] + " " + plusCheck[1];
     }
     else if (slashCheck[1]) {
-        var value = slashCheck[0] + "/" + slashCheck[1];
+        value = slashCheck[0] + "/" + slashCheck[1];
     }
     else {
-        var value = getValue[1];
+        value = getValue[1];
     }
     return (value);
 }
@@ -128,15 +129,18 @@ window.addEventListener('load', function () {
         pointSize = circleRadius * 0.1;
         svgSize = circleRadius * 400;
         svgMid = svgSize / 2;
-        render(data);
+        render(diagramValues[0]);
     });
     getValues();
     var point = {};
     features.forEach(function (f) { return point[f] = 0; });
-    data.push(point);
+    diagramValues.push(point);
+    features.forEach(function (f) { return point[f] = 0; });
+    diagramValues.push(point);
     document.getElementById('addCategory').onclick = addCategory;
     showPreSelected();
-    render(data);
+    render(diagramValues[0]);
+    render(diagramValues[1]);
 });
 function render(data) {
     var oldSVG = document.getElementById('svg');
@@ -201,7 +205,7 @@ function render(data) {
                 .attr("stroke", "grey")
                 .attr("r", radialScale(pointSize))
                 .attr("id", id)
-                .on('click', function () { return updateData(ft_name, k); });
+                .on('click', function () { return updateData(data, ft_name, k); });
         };
         for (var k = 1; k <= levels; k++) {
             _loop_3(k);
@@ -213,20 +217,18 @@ function render(data) {
     var line = d3.line()
         .x(function (d) { return d.x; })
         .y(function (d) { return d.y; });
-    for (var i = 0; i < data.length; i++) {
-        var d = data[i];
-        var color = "navy";
-        var coordinates = getPathCoordinates(d);
-        svg.append("path")
-            .datum(coordinates)
-            .attr("d", line)
-            .attr("stroke-width", 3)
-            .attr("stroke", color)
-            .attr("fill", color)
-            .attr("stroke-opacity", 1)
-            .attr("opacity", 0.5)
-            .attr("style", "pointer-events: none;");
-    }
+    var d = data;
+    var color = "navy";
+    var coordinates = getPathCoordinates(d);
+    svg.append("path")
+        .datum(coordinates)
+        .attr("d", line)
+        .attr("stroke-width", 3)
+        .attr("stroke", color)
+        .attr("fill", color)
+        .attr("stroke-opacity", 1)
+        .attr("opacity", 0.5)
+        .attr("style", "pointer-events: none;");
 }
 function keyListener(event) {
     switch (event.keyCode) {
@@ -236,7 +238,7 @@ function keyListener(event) {
     }
 }
 function test() {
-    console.log(data, secondData);
+    console.log(diagramValues);
 }
 window.addEventListener("keydown", keyListener);
 window.addEventListener("keyup", keyListener);
