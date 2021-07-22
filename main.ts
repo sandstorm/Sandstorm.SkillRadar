@@ -137,22 +137,21 @@ function isolateGetParam(urlGetValues, i) {
 window.addEventListener('load', () => {
     getValues();
 
-    /* function handleSubmit(event) {
+    function handleSubmit(event) {
         event.preventDefault();
 
         const data = new FormData(event.target);
         console.log(data)
 
-        const value = Object.fromEntries(data.entries());
-        console.log(value)
+        const test = data.forEach((d) => console.log(d));
 
-        const json = JSON.stringify(value);
-        console.log(json)
-        debugger
-        window.open("main.html", "_self")
+        /* const json = JSON.stringify(value);
+        console.log(json) */
+        /* debugger
+        window.open("main.html", "_self") */
     }
     const form = document.querySelector('form');
-    form.addEventListener('submit', handleSubmit); */
+    form.addEventListener('submit', handleSubmit);
 
     const reducer = (acc, current) => ({
         ...acc,
