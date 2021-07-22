@@ -53,8 +53,8 @@ function showPreSelected() {
         var index = i - 2;
         var newInput = document.createElement("input");
         newInput.setAttribute("type", "text");
-        newInput.setAttribute("id", "selection" + index);
-        newInput.setAttribute("name", index.toString());
+        newInput.setAttribute("id", "selection" + i);
+        newInput.setAttribute("name", i.toString());
         if (features[index])
             newInput.setAttribute("value", features[index]);
         topicSelection.appendChild(newInput);
@@ -135,6 +135,16 @@ function isolateGetParam(urlGetValues, i) {
 }
 window.addEventListener('load', function () {
     getValues();
+    function handleSubmit(event) {
+        event.preventDefault();
+        var data = {};
+        var json = JSON.stringify(value);
+        console.log(json);
+        debugger;
+        window.open("main.html", "_self");
+    }
+    var form = document.querySelector('form');
+    form.addEventListener('submit', handleSubmit);
     var reducer = function (acc, current) {
         var _a;
         return (__assign(__assign({}, acc), (_a = {}, _a[current] = 0, _a)));
