@@ -16,3 +16,10 @@ diagramValues => json
 json => url encode
 =================
 url lesen => url decoden => json in object umwandeln => state
+
+z-index: 999;
+    width: 40%;
+    position: absolute;
+    top: 2%;
+    right: 15%;
+}

@@ -1,4 +1,4 @@
-let circleRadius: number = 3;
+let circleRadius: number = 2.5;
 let pointSize: number = circleRadius * 0.1;
 let svgSize: number = circleRadius * 400;
 let svgMid: number = svgSize / 2;
@@ -135,17 +135,7 @@ function isolateGetParam(urlGetValues, i) {
 
 
 window.addEventListener('load', () => {
-    document.getElementById("scale").addEventListener('change', (event) => {
-        circleRadius = event.target.value;
-        pointSize = circleRadius * 0.1;
-        svgSize = circleRadius * 400;
-        svgMid = svgSize / 2;
-
-        render(0);
-        render(1);
-    })
     getValues();
-
     
     const reducer = (acc, current) => ({
         ...acc,

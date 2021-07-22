@@ -9,7 +9,7 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-var circleRadius = 3;
+var circleRadius = 2.5;
 var pointSize = circleRadius * 0.1;
 var svgSize = circleRadius * 400;
 var svgMid = svgSize / 2;
@@ -134,14 +134,6 @@ function isolateGetParam(urlGetValues, i) {
     return (value);
 }
 window.addEventListener('load', function () {
-    document.getElementById("scale").addEventListener('change', function (event) {
-        circleRadius = event.target.value;
-        pointSize = circleRadius * 0.1;
-        svgSize = circleRadius * 400;
-        svgMid = svgSize / 2;
-        render(0);
-        render(1);
-    });
     getValues();
     var reducer = function (acc, current) {
         var _a;
