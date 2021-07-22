@@ -131,27 +131,42 @@ function isolateGetParam(urlGetValues, i) {
     return (value);
 }
 
+function diagramURL() {
+    console.log("yes")
+    console.log(diagramValues[0]["Backendentwicklung"])
+}
+
+function handleSubmit(event) {
+    event.preventDefault();
+
+    let jsonData = new Array;
+
+    const data = new FormData(event.target);
+    data.forEach((d, i) => { console.log(d, i) })
+
+    let dataContainer = new Object;
+    for (let i = 0; i < diagramValues.length; i++) {
+        data.forEach((d, index) => {
+            const num: number = Number(index);
+            console.log(num)
+            if (num == 0 || num == 1) { }
+            else { dataContainer[d] = diagramValues[i][d] }
+        })
+        jsonData.push(dataContainer);
+        dataContainer = [];
+    }
+    console.log(jsonData)
+
+    /* const json = JSON.stringify(jsonData);
+    console.log(json) */
+    /* window.open("main.html", "_self") */
+}
+
 // --------------------------------------------------------------------------------------------------------------
 
 
 window.addEventListener('load', () => {
     getValues();
-
-    function handleSubmit(event) {
-        event.preventDefault();
-
-        const data = new FormData(event.target);
-        console.log(data)
-
-        const test = data.forEach((d) => console.log(d));
-
-        /* const json = JSON.stringify(value);
-        console.log(json) */
-        /* debugger
-        window.open("main.html", "_self") */
-    }
-    const form = document.querySelector('form');
-    form.addEventListener('submit', handleSubmit);
 
     const reducer = (acc, current) => ({
         ...acc,
@@ -160,6 +175,10 @@ window.addEventListener('load', () => {
 
     diagramValues.push(features.reduce(reducer, {}))
     diagramValues.push(features.reduce(reducer, {}))
+
+    document.getElementById("urlButton").onclick = diagramURL;
+    const form = document.querySelector('form');
+    form.addEventListener('submit', handleSubmit);
 
     document.getElementById('addCategory').onclick = addCategory;
 

@@ -133,22 +133,44 @@ function isolateGetParam(urlGetValues, i) {
     }
     return (value);
 }
+function diagramURL() {
+    console.log("yes");
+    console.log(diagramValues[0]["Backendentwicklung"]);
+}
+function handleSubmit(event) {
+    event.preventDefault();
+    var jsonData = new Array;
+    var data = new FormData(event.target);
+    data.forEach(function (d, i) { console.log(d, i); });
+    var dataContainer = new Object;
+    var _loop_2 = function (i) {
+        data.forEach(function (d, index) {
+            var num = Number(index);
+            console.log(num);
+            if (num == 0 || num == 1) { }
+            else {
+                dataContainer[d] = diagramValues[i][d];
+            }
+        });
+        jsonData.push(dataContainer);
+        dataContainer = [];
+    };
+    for (var i = 0; i < diagramValues.length; i++) {
+        _loop_2(i);
+    }
+    console.log(jsonData);
+}
 window.addEventListener('load', function () {
     getValues();
-    function handleSubmit(event) {
-        event.preventDefault();
-        var data = new FormData(event.target);
-        console.log(data);
-        var test = data.forEach(function (d) { return console.log(d); });
-    }
-    var form = document.querySelector('form');
-    form.addEventListener('submit', handleSubmit);
     var reducer = function (acc, current) {
         var _a;
         return (__assign(__assign({}, acc), (_a = {}, _a[current] = 0, _a)));
     };
     diagramValues.push(features.reduce(reducer, {}));
     diagramValues.push(features.reduce(reducer, {}));
+    document.getElementById("urlButton").onclick = diagramURL;
+    var form = document.querySelector('form');
+    form.addEventListener('submit', handleSubmit);
     document.getElementById('addCategory').onclick = addCategory;
     showPreSelected();
     render(0);
@@ -187,7 +209,7 @@ function render(n) {
                 .style("font-size", 10 * circleRadius + "px");
         }
     }
-    var _loop_2 = function (i) {
+    var _loop_3 = function (i) {
         var ft_name = features[i];
         var angle = (Math.PI / 2) + (2 * Math.PI * i / features.length);
         var line_coordinate = angleToCoordinate(angle, circleRadius * 5);
@@ -208,7 +230,7 @@ function render(n) {
             label.attr("text-anchor", "middle");
         if (i < features.length / 2 && i > 0)
             label.attr("text-anchor", "end");
-        var _loop_3 = function (k) {
+        var _loop_4 = function (k) {
             var pointCoordinate = angleToCoordinate(angle, k * circleRadius);
             var point = svg.append("circle")
                 .attr("cx", pointCoordinate.x)
@@ -219,11 +241,11 @@ function render(n) {
                 .on('click', function () { return updateData(ft_name, k, n); });
         };
         for (var k = 1; k <= levels; k++) {
-            _loop_3(k);
+            _loop_4(k);
         }
     };
     for (var i = 0; i < features.length; i++) {
-        _loop_2(i);
+        _loop_3(i);
     }
     var line = d3.line()
         .x(function (d) { return d.x; })
