@@ -51,8 +51,8 @@ function showPreSelected() {
         const index = i - 2;
         let newInput = document.createElement("input");
         newInput.setAttribute("type", "text");
-        newInput.setAttribute("id", "selection" + index)
-        newInput.setAttribute("name", index.toString())
+        newInput.setAttribute("id", "selection" + i)
+        newInput.setAttribute("name", i.toString())
         if (features[index]) newInput.setAttribute("value", features[index]);
         topicSelection.appendChild(newInput);
 
@@ -136,7 +136,20 @@ function isolateGetParam(urlGetValues, i) {
 
 window.addEventListener('load', () => {
     getValues();
-    
+
+    function handleSubmit(event) {
+        event.preventDefault();
+        const data = {
+            
+        }
+        const json = JSON.stringify(value);
+        console.log(json)
+        debugger
+        window.open("main.html", "_self")
+    }
+    const form = document.querySelector('form');
+    form.addEventListener('submit', handleSubmit);
+
     const reducer = (acc, current) => ({
         ...acc,
         [current]: 0
@@ -156,13 +169,13 @@ window.addEventListener('load', () => {
 
 function render(n: number) {
     const data = diagramValues[n]
-    
-    const oldSVG = document.getElementById('svg'+ n.toString());
+
+    const oldSVG = document.getElementById('svg' + n.toString());
     if (oldSVG) oldSVG.remove();
-    const svg = d3.select(document.getElementById("svgContainer"+ n.toString())).append("svg")
+    const svg = d3.select(document.getElementById("svgContainer" + n.toString())).append("svg")
         .attr("width", svgSize)
         .attr("height", svgSize)
-        .attr("id", "svg"+n)
+        .attr("id", "svg" + n)
 
     for (let i: number = 0; i <= levels; i++) {
         const pos = i * circleRadius;
@@ -218,7 +231,7 @@ function render(n: number) {
 
         for (let k = 1; k <= levels; k++) {
             const pointCoordinate = angleToCoordinate(angle, k * circleRadius)
-            
+
             const point = svg.append("circle")
                 .attr("cx", pointCoordinate.x)
                 .attr("cy", pointCoordinate.y)
@@ -234,20 +247,20 @@ function render(n: number) {
         .x(d => d.x)
         .y(d => d.y);
 
-        let d = data;
+    let d = data;
 
-        let color = "navy";
-        let coordinates = getPathCoordinates(d);
+    let color = "navy";
+    let coordinates = getPathCoordinates(d);
 
-        svg.append("path")
-            .datum(coordinates)
-            .attr("d", line)
-            .attr("stroke-width", 3)
-            .attr("stroke", color)
-            .attr("fill", color)
-            .attr("stroke-opacity", 1)
-            .attr("opacity", 0.5)
-            .attr("style", "pointer-events: none;")
+    svg.append("path")
+        .datum(coordinates)
+        .attr("d", line)
+        .attr("stroke-width", 3)
+        .attr("stroke", color)
+        .attr("fill", color)
+        .attr("stroke-opacity", 1)
+        .attr("opacity", 0.5)
+        .attr("style", "pointer-events: none;")
 
 }
 
