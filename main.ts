@@ -14,7 +14,7 @@ const radialScale = d3.scaleLinear()
     .domain([0, 10])
     .range([0, 250]);
 
-
+//updating diagram data to show
 function updateData(feature: string, k: number, n: number) {
     diagramValues[n][feature] = k * circleRadius;
     render(n);
