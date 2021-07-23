@@ -18,6 +18,30 @@ var numberFeatures = 10;
 var diagramValues = [];
 var features = ["Softwarearchitektur", "Frontendentwicklung", "Backendentwicklung", "Design/UX", "Infrastruktur", "Operations", "Strategie", "Projektmanagement", "Marketing", "Social Consulting"];
 var diagramTitles = ["Skills", "Interests"];
+function adjustToWindowSize() {
+    for (var i = 0; i < features.length; i++) {
+        diagramValues[0][features[i]] = diagramValues[0][features[i]] / circleRadius;
+        diagramValues[1][features[i]] = diagramValues[1][features[i]] / circleRadius;
+    }
+    var testedCircleSize = 2.5;
+    var windowHeight = window.innerHeight;
+    var windowWidth = window.innerWidth;
+    var testedHeight = 1440;
+    var testedWidth = 2560;
+    var percent = (windowWidth / testedWidth) * 100;
+    var newCircleSize = (testedCircleSize * percent) / 100;
+    circleRadius = newCircleSize;
+    pointSize = circleRadius * 0.1;
+    svgSize = circleRadius * 400;
+    svgMid = svgSize / 2;
+    for (var i = 0; i < features.length; i++) {
+        diagramValues[0][features[i]] = diagramValues[0][features[i]] * circleRadius;
+        diagramValues[1][features[i]] = diagramValues[1][features[i]] * circleRadius;
+    }
+    document.getElementById("selection").style.transform = "scale(" + windowWidth / testedWidth + ")";
+    render(0);
+    render(1);
+}
 var radialScale = d3.scaleLinear()
     .domain([0, 10])
     .range([0, 250]);
@@ -134,14 +158,24 @@ function isolateGetParam(urlGetValues, i) {
     return (value);
 }
 function diagramURL() {
-    console.log("yes");
-    console.log(diagramValues[0]["Backendentwicklung"]);
+    var jsonData = new Array;
+    for (var i = 0; i < diagramValues.length; i++) {
+        jsonData.push(diagramValues[i]);
+    }
+    var json = encodeURIComponent(JSON.stringify(jsonData));
+    var dummy = document.createElement("input");
+    document.body.appendChild(dummy);
+    dummy.setAttribute("id", "dummy_id");
+    document.getElementById("dummy_id").value = "http://127.0.0.1:5500/main.html?data=" + json;
+    dummy.select();
+    document.execCommand("copy");
+    document.body.removeChild(dummy);
 }
 function handleSubmit(event) {
     event.preventDefault();
     var jsonData = new Array;
     var data = new FormData(event.target);
-    data.forEach(function (d, i) { console.log(d, i); });
+    diagramTitles.forEach(function (d, i) { console.log(d, i); });
     var dataContainer = new Object;
     var _loop_2 = function (i) {
         data.forEach(function (d, index) {
@@ -160,7 +194,16 @@ function handleSubmit(event) {
     }
     console.log(jsonData);
 }
+function deCodeURL() {
+    if (window.location.href.split("?")[1]) {
+        var encoded = window.location.href.split("?")[1];
+        var decoded = JSON.parse(encoded);
+        console.log(decoded);
+        diagramValues = decoded;
+    }
+}
 window.addEventListener('load', function () {
+    window.addEventListener('resize', function () { adjustToWindowSize(); });
     getValues();
     var reducer = function (acc, current) {
         var _a;
@@ -169,10 +212,9 @@ window.addEventListener('load', function () {
     diagramValues.push(features.reduce(reducer, {}));
     diagramValues.push(features.reduce(reducer, {}));
     document.getElementById("urlButton").onclick = diagramURL;
-    var form = document.querySelector('form');
-    form.addEventListener('submit', handleSubmit);
     document.getElementById('addCategory').onclick = addCategory;
     showPreSelected();
+    adjustToWindowSize();
     render(0);
     render(1);
 });
@@ -237,7 +279,12 @@ function render(n) {
                 .attr("cy", pointCoordinate.y)
                 .attr("fill", "black")
                 .attr("stroke", "grey")
-                .attr("r", radialScale(pointSize))
+                .attr("r", radialScale(pointSize));
+            var onclickArea = svg.append("circle")
+                .attr("cx", pointCoordinate.x)
+                .attr("cy", pointCoordinate.y)
+                .attr("fill", "transparent")
+                .attr("r", 9 * circleRadius)
                 .on('click', function () { return updateData(ft_name, k, n); });
         };
         for (var k = 1; k <= levels; k++) {
@@ -271,7 +318,9 @@ function keyListener(event) {
     }
 }
 function test() {
-    console.log(diagramValues);
+    var jsonTest = window.location.href;
+    console.log(JSON.stringify(jsonTest));
+    console.log(JSON.parse(jsonTest));
 }
 window.addEventListener("keydown", keyListener);
 window.addEventListener("keyup", keyListener);

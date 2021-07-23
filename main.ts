@@ -9,6 +9,32 @@ let diagramValues = [];
 let features = ["Softwarearchitektur", "Frontendentwicklung", "Backendentwicklung", "Design/UX", "Infrastruktur", "Operations", "Strategie", "Projektmanagement", "Marketing", "Social Consulting"];
 let diagramTitles = ["Skills", "Interests"];
 
+function adjustToWindowSize() {
+    for (let i = 0; i < features.length; i++) {
+        diagramValues[0][features[i]] = diagramValues[0][features[i]] / circleRadius; 
+        diagramValues[1][features[i]] = diagramValues[1][features[i]] / circleRadius; 
+    }
+    const testedCircleSize = 2.5;
+    const windowHeight = window.innerHeight;
+    const windowWidth = window.innerWidth;
+
+    const testedHeight = 1440;
+    const testedWidth = 2560;
+
+    const percent = (windowWidth / testedWidth) * 100;
+    const newCircleSize = (testedCircleSize * percent) / 100;
+    circleRadius = newCircleSize;
+    pointSize = circleRadius * 0.1;
+    svgSize = circleRadius * 400;
+    svgMid = svgSize / 2;
+    for (let i = 0; i < features.length; i++) {
+        diagramValues[0][features[i]] = diagramValues[0][features[i]] * circleRadius; 
+        diagramValues[1][features[i]] = diagramValues[1][features[i]] * circleRadius; 
+    }
+    document.getElementById("selection").style.transform = "scale("+ windowWidth / testedWidth + ")";
+    render(0);
+    render(1);
+}
 
 const radialScale = d3.scaleLinear()
     .domain([0, 10])
@@ -132,17 +158,32 @@ function isolateGetParam(urlGetValues, i) {
 }
 
 function diagramURL() {
-    console.log("yes")
-    console.log(diagramValues[0]["Backendentwicklung"])
+    let jsonData: Array<Object> = new Array;
+
+    for (let i = 0; i < diagramValues.length; i++) {
+        jsonData.push(diagramValues[i]);
+    }
+    const json = encodeURIComponent(JSON.stringify(jsonData));
+
+    let dummy = document.createElement("input");
+    document.body.appendChild(dummy);
+    dummy.setAttribute("id", "dummy_id");
+    document.getElementById("dummy_id").value = "http://127.0.0.1:5500/main.html?data=" + json;
+    dummy.select();
+    document.execCommand("copy");
+    document.body.removeChild(dummy);
 }
 
 function handleSubmit(event) {
     event.preventDefault();
 
-    let jsonData = new Array;
+    let jsonData: Array<Object> = new Array;
+
+    /* console.log (Object.keys(diagramValues[0]).length) // returns 10
+    console.log (Object.entries(diagramValues[0])) // returns 10 separate arrays of Object Keys */
 
     const data = new FormData(event.target);
-    data.forEach((d, i) => { console.log(d, i) })
+    diagramTitles.forEach((d, i) => { console.log(d, i) })
 
     let dataContainer = new Object;
     for (let i = 0; i < diagramValues.length; i++) {
@@ -162,10 +203,22 @@ function handleSubmit(event) {
     /* window.open("main.html", "_self") */
 }
 
+function deCodeURL() {
+    if (window.location.href.split("?")[1]) {
+        const encoded = window.location.href.split("?")[1];
+        const decoded = JSON.parse(encoded);
+        console.log(decoded)
+        diagramValues = decoded;
+    }
+}
 // --------------------------------------------------------------------------------------------------------------
 
 
 window.addEventListener('load', () => {
+    window.addEventListener('resize', () => { adjustToWindowSize() })
+    /* try {getValues()}
+    catch (error) {console.log(error); deCodeURL()} */
+    /* deCodeURL() */
     getValues();
 
     const reducer = (acc, current) => ({
@@ -177,12 +230,13 @@ window.addEventListener('load', () => {
     diagramValues.push(features.reduce(reducer, {}))
 
     document.getElementById("urlButton").onclick = diagramURL;
-    const form = document.querySelector('form');
-    form.addEventListener('submit', handleSubmit);
+    /* const form = document.querySelector('form');
+    form.addEventListener('submit', handleSubmit); */
 
     document.getElementById('addCategory').onclick = addCategory;
 
     showPreSelected();
+    adjustToWindowSize();
     render(0);
     render(1);
 })
@@ -260,6 +314,12 @@ function render(n: number) {
                 .attr("fill", "black")
                 .attr("stroke", "grey")
                 .attr("r", radialScale(pointSize))
+
+            const onclickArea = svg.append("circle")
+                .attr("cx", pointCoordinate.x)
+                .attr("cy", pointCoordinate.y)
+                .attr("fill", "transparent")
+                .attr("r", 9 * circleRadius)
                 .on('click', () => updateData(ft_name, k, n))
         }
 
@@ -297,7 +357,9 @@ function keyListener(event) {
     }
 }
 function test() {
-    console.log(diagramValues)
+    const jsonTest = window.location.href;
+    console.log(JSON.stringify(jsonTest))
+    console.log(JSON.parse(jsonTest))
 }
 window.addEventListener("keydown", keyListener);
 window.addEventListener("keyup", keyListener);

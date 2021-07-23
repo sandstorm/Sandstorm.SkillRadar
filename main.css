@@ -2,6 +2,7 @@
   z-index: 999;
   width: 40%;
   top: 0%;
+  position: absolute;
 }
 
 .svgContainer1 {
@@ -15,14 +16,17 @@
 .selection {
   position:absolute;
   top: 1%;
-  right:0;
-  font-size: 20px;
-  width: 200px;
+  right:0%;
+  font-size: 100%;
+  width: 190px;
   z-index: 99;
-  overflow: auto
+  height: auto;
+  transform-origin: top right;
 }
 
-
+.bodyDiv {
+  width: 100%;
+}
 
 @media print {
   @page {size: landscape}
