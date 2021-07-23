@@ -9,7 +9,8 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-var circleRadius = 2.5;
+var initialCircleRadius = 3;
+var circleRadius = initialCircleRadius;
 var pointSize = circleRadius * 0.1;
 var svgSize = circleRadius * 400;
 var svgMid = svgSize / 2;
@@ -23,13 +24,12 @@ function adjustToWindowSize() {
         diagramValues[0][features[i]] = diagramValues[0][features[i]] / circleRadius;
         diagramValues[1][features[i]] = diagramValues[1][features[i]] / circleRadius;
     }
-    var testedCircleSize = 2.5;
     var windowHeight = window.innerHeight;
     var windowWidth = window.innerWidth;
     var testedHeight = 1440;
     var testedWidth = 2560;
     var percent = (windowWidth / testedWidth) * 100;
-    var newCircleSize = (testedCircleSize * percent) / 100;
+    var newCircleSize = (initialCircleRadius * percent) / 100;
     circleRadius = newCircleSize;
     pointSize = circleRadius * 0.1;
     svgSize = circleRadius * 400;
@@ -38,7 +38,7 @@ function adjustToWindowSize() {
         diagramValues[0][features[i]] = diagramValues[0][features[i]] * circleRadius;
         diagramValues[1][features[i]] = diagramValues[1][features[i]] * circleRadius;
     }
-    document.getElementById("selection").style.transform = "scale(" + windowWidth / testedWidth + ")";
+    document.getElementById("selection").style.transform = "scale(" + (windowWidth / testedWidth + 0.2) + ")";
     render(0);
     render(1);
 }
@@ -46,7 +46,8 @@ var radialScale = d3.scaleLinear()
     .domain([0, 10])
     .range([0, 250]);
 function updateData(feature, k, n) {
-    diagramValues[n][feature] = k * circleRadius;
+    diagramValues[n][feature] = k;
+    console.log(diagramValues);
     render(n);
 }
 function angleToCoordinate(angle, value) {
@@ -59,7 +60,7 @@ function getPathCoordinates(data_point) {
     for (var i = 0; i < features.length; i++) {
         var ft_name = features[i];
         var angle = (Math.PI / 2) + (2 * Math.PI * i / features.length);
-        coordinates.push(angleToCoordinate(angle, data_point[ft_name]));
+        coordinates.push(angleToCoordinate(angle, data_point[ft_name] * circleRadius));
     }
     return coordinates;
 }
@@ -115,58 +116,14 @@ function removeCategory(input, button) {
     features.splice(features.indexOf(input.value), 1);
     numberFeatures -= 1;
 }
-function getValues() {
-    var urlSplit = window.location.href.split("?");
-    if (urlSplit[1]) {
-        features = [];
-        var urlGetValues = urlSplit[1].split("&");
-        numberFeatures = urlGetValues.length - 2;
-        for (var i = 0; i < urlGetValues.length; i++) {
-            if (i == 0) {
-                var value = isolateGetParam(urlGetValues, i);
-                diagramTitles[0] = value;
-            }
-            else if (i == 1) {
-                var value = isolateGetParam(urlGetValues, i);
-                diagramTitles[1] = value;
-            }
-            else {
-                var value = isolateGetParam(urlGetValues, i);
-                if (typeof value == "string") {
-                    features.push(value);
-                }
-                else if (typeof value == "number") {
-                }
-            }
-        }
-    }
-}
-function isolateGetParam(urlGetValues, i) {
-    var getValue = urlGetValues[i].split("=");
-    var plusCheck = getValue[1].split("+");
-    var slashCheck = getValue[1].split("%2F");
-    var value;
-    if (plusCheck[1]) {
-        value = plusCheck[0] + " " + plusCheck[1];
-    }
-    else if (slashCheck[1]) {
-        value = slashCheck[0] + "/" + slashCheck[1];
-    }
-    else {
-        value = getValue[1];
-    }
-    return (value);
-}
 function diagramURL() {
     var jsonData = new Array;
-    for (var i = 0; i < diagramValues.length; i++) {
-        jsonData.push(diagramValues[i]);
-    }
-    var json = encodeURIComponent(JSON.stringify(jsonData));
+    jsonData = diagramValues;
+    jsonData.push(diagramTitles);
     var dummy = document.createElement("input");
     document.body.appendChild(dummy);
     dummy.setAttribute("id", "dummy_id");
-    document.getElementById("dummy_id").value = "http://127.0.0.1:5500/main.html?data=" + json;
+    document.getElementById("dummy_id").value = location.origin + location.pathname + "?data=" + encodeURIComponent(JSON.stringify(jsonData));
     dummy.select();
     document.execCommand("copy");
     document.body.removeChild(dummy);
@@ -175,44 +132,53 @@ function handleSubmit(event) {
     event.preventDefault();
     var jsonData = new Array;
     var data = new FormData(event.target);
-    diagramTitles.forEach(function (d, i) { console.log(d, i); });
     var dataContainer = new Object;
-    var _loop_2 = function (i) {
-        data.forEach(function (d, index) {
-            var num = Number(index);
-            console.log(num);
-            if (num == 0 || num == 1) { }
-            else {
-                dataContainer[d] = diagramValues[i][d];
-            }
-        });
+    var titleContainer = new Array;
+    data.forEach(function (d, i) {
+        var index = Number(i);
+        if (index == 0 || index == 1) {
+            titleContainer.push(d);
+        }
+        else {
+            dataContainer[d] = 0;
+        }
+    });
+    for (var i = 0; i < diagramTitles.length; i++) {
         jsonData.push(dataContainer);
-        dataContainer = [];
-    };
-    for (var i = 0; i < diagramValues.length; i++) {
-        _loop_2(i);
     }
-    console.log(jsonData);
+    jsonData.push(titleContainer);
+    var encodedData = encodeURIComponent(JSON.stringify(jsonData));
+    window.open(location.origin + location.pathname + "?data=" + encodedData, "_self");
 }
 function deCodeURL() {
-    if (window.location.href.split("?")[1]) {
-        var encoded = window.location.href.split("?")[1];
-        var decoded = JSON.parse(encoded);
-        console.log(decoded);
-        diagramValues = decoded;
-    }
+    var encodedData = new URLSearchParams(location.search).get("data");
+    var decodedData = JSON.parse(decodeURIComponent(encodedData));
+    diagramValues[0] = decodedData[0];
+    diagramValues[1] = decodedData[1];
+    diagramTitles = decodedData[2];
+    features = Object.getOwnPropertyNames(diagramValues[0]);
+    numberFeatures = features.length;
+}
+function printButton() {
+    window.print();
 }
 window.addEventListener('load', function () {
-    window.addEventListener('resize', function () { adjustToWindowSize(); });
-    getValues();
-    var reducer = function (acc, current) {
-        var _a;
-        return (__assign(__assign({}, acc), (_a = {}, _a[current] = 0, _a)));
-    };
-    diagramValues.push(features.reduce(reducer, {}));
-    diagramValues.push(features.reduce(reducer, {}));
+    if (location.search) {
+        deCodeURL();
+    }
+    else {
+        var reducer = function (acc, current) {
+            var _a;
+            return (__assign(__assign({}, acc), (_a = {}, _a[current] = 0, _a)));
+        };
+        diagramValues.push(features.reduce(reducer, {}));
+        diagramValues.push(features.reduce(reducer, {}));
+    }
     document.getElementById("urlButton").onclick = diagramURL;
+    var form = document.querySelector('form');
+    form.addEventListener('submit', handleSubmit);
     document.getElementById('addCategory').onclick = addCategory;
+    document.getElementById("printButton").onclick = printButton;
     showPreSelected();
     adjustToWindowSize();
     render(0);
@@ -251,7 +217,7 @@ function render(n) {
                 .style("font-size", 10 * circleRadius + "px");
         }
     }
-    var _loop_3 = function (i) {
+    var _loop_2 = function (i) {
         var ft_name = features[i];
         var angle = (Math.PI / 2) + (2 * Math.PI * i / features.length);
         var line_coordinate = angleToCoordinate(angle, circleRadius * 5);
@@ -272,7 +238,7 @@ function render(n) {
             label.attr("text-anchor", "middle");
         if (i < features.length / 2 && i > 0)
             label.attr("text-anchor", "end");
-        var _loop_4 = function (k) {
+        var _loop_3 = function (k) {
             var pointCoordinate = angleToCoordinate(angle, k * circleRadius);
             var point = svg.append("circle")
                 .attr("cx", pointCoordinate.x)
@@ -288,11 +254,11 @@ function render(n) {
                 .on('click', function () { return updateData(ft_name, k, n); });
         };
         for (var k = 1; k <= levels; k++) {
-            _loop_4(k);
+            _loop_3(k);
         }
     };
     for (var i = 0; i < features.length; i++) {
-        _loop_3(i);
+        _loop_2(i);
     }
     var line = d3.line()
         .x(function (d) { return d.x; })
@@ -318,9 +284,12 @@ function keyListener(event) {
     }
 }
 function test() {
-    var jsonTest = window.location.href;
-    console.log(JSON.stringify(jsonTest));
-    console.log(JSON.parse(jsonTest));
+    if (location.search) {
+        console.log(location.search);
+    }
+    else {
+        console.log("no");
+    }
 }
 window.addEventListener("keydown", keyListener);
 window.addEventListener("keyup", keyListener);

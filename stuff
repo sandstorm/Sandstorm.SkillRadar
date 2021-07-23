@@ -23,3 +23,187 @@ z-index: 999;
     top: 2%;
     right: 15%;
 }
+
+
+console.log(diagramValues)
+const string = encodeURIComponent(JSON.stringify(diagramValues));
+const encoded = encodeURIComponent(string);
+console.log(encoded);
+const decoded = JSON.parse(decodeURIComponent(encoded));
+console.log(JSON.parse(decoded))
+
+
+
+@media (min-aspect-ratio: 16/9) {
+  .svgContainer {
+    z-index: 999;
+    width: 40%;
+    top: 0%;
+    position: relative;
+  }
+
+  .svgContainer1 {
+    z-index: 999;
+    width: 40%;
+    position: absolute;
+    top: 0%;
+    right: 15%;
+  }
+
+  .selection {
+    position:absolute;
+    top: 1%;
+    right:0%;
+    font-size: 100%;
+    width: 190px;
+    z-index: 99;
+    height: 100vh;
+    transform-origin: top right;
+  }
+
+  .bodyDiv {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* --------------------------------------- */
+
+@media (max-aspect-ratio: 16/9) {
+  .svgContainer {
+    z-index: 999;
+    width: 40%;
+    top: 0%;
+    left: 25%;
+    position: relative;
+  }
+
+  .svgContainer1 {
+    z-index: 999;
+    width: 40%;
+    left: 25%;
+    position: relative;
+  }
+
+  .selection {
+    position:absolute;
+    top: 1%;
+    right:0%;
+    font-size: 100%;
+    width: 190px;
+    z-index: 99;
+    height: 100vh;
+    transform-origin: top right;
+  }
+
+  .bodyDiv {
+    width: 100%;
+  }
+}
+
+/* --------------------------------------- */
+
+@media screen and (orientation: portrait) {
+  .svgContainer {
+    z-index: 999;
+    width: 40%;
+    top: 10px;
+    position: relative;
+    transform: scale(1.2);
+    padding-bottom: 3%;
+  }
+
+  .svgContainer1 {
+    z-index: 999;
+    width: 40%;
+    position: relative;
+    top: 0%;
+    right: 15%;
+    transform: scale(1.2);
+  }
+
+  .selection {
+    position:absolute;
+    top: 1%;
+    right:0%;
+    font-size: 100%;
+    width: 190px;
+    z-index: 99;
+    height: 100vh;
+    transform-origin: top right;
+  }
+
+  .bodyDiv {
+    width: 100%;
+  }
+}
+
+/* --------------------------------------- */
+
+@media screen and (orientation: landscape) {
+  .svgContainer {
+    z-index: 999;
+    width: 40%;
+    top: 0%;
+    left: 0%;
+    position: relative;
+  }
+
+  .svgContainer1 {
+    z-index: 999;
+    width: 40%;
+    top: 0%;
+    left: 45%;
+    position: absolute;
+  }
+
+  .selection {
+    position:absolute;
+    top: 1%;
+    right:0%;
+    font-size: 100%;
+    width: 190px;
+    z-index: 99;
+    height: 100vh;
+    transform-origin: top right;
+  }
+
+  .bodyDiv {
+    width: 100%;
+  }
+}
+
+/* --------------------------------------- */
+
+@media print {
+  @page {size: landscape}
+
+  html, body {
+    width: 297mm;
+    height: 210mm;
+  }
+
+  .selection {
+     visibility: hidden;
+  }
+
+  .svgContainer {
+    transform: scale(.6);
+    left: -10%;
+    top: -10%;
+    position: absolute;
+  }
+  .svgContainer1 {
+    transform: scale(.6);
+    right: 20%;
+    top: -10%;
+    position: absolute;
+  }
+
+}
+
+.copyButton {
+  height: 5%;
+  width: 80%;
+}
+

@@ -6,6 +6,7 @@
     <script src="https://d3js.org/d3.v7.min.js"> </script>
     <script src="main.js" type="module"> </script>
     <title>Main.html</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 </head>
 
 <body>
@@ -20,7 +21,8 @@
                 <input type="submit" value="Submit">
                 <button id="addCategory" type="button">+</button>
             </form>
-            <button id="urlButton" style="width: 72%">Copy Diagram-URL to Clipboard</button>
+            <button id="urlButton" class="copyButton">Copy Diagram-URL to Clipboard</button>
+            <button id="printButton" class="printButton">Print</button>
         </div>
         <div id="svgContainer1" class="svgContainer1"></div>
     </div>
