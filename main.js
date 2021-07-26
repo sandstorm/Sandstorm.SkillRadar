@@ -20,10 +20,6 @@ var diagramValues = [];
 var features = ["Softwarearchitektur", "Frontendentwicklung", "Backendentwicklung", "Design/UX", "Infrastruktur", "Operations", "Strategie", "Projektmanagement", "Marketing", "Social Consulting"];
 var diagramTitles = ["Skills", "Interests"];
 function adjustToWindowSize() {
-    for (var i = 0; i < features.length; i++) {
-        diagramValues[0][features[i]] = diagramValues[0][features[i]] / circleRadius;
-        diagramValues[1][features[i]] = diagramValues[1][features[i]] / circleRadius;
-    }
     var windowHeight = window.innerHeight;
     var windowWidth = window.innerWidth;
     var testedHeight = 1440;
@@ -34,10 +30,6 @@ function adjustToWindowSize() {
     pointSize = circleRadius * 0.1;
     svgSize = circleRadius * 400;
     svgMid = svgSize / 2;
-    for (var i = 0; i < features.length; i++) {
-        diagramValues[0][features[i]] = diagramValues[0][features[i]] * circleRadius;
-        diagramValues[1][features[i]] = diagramValues[1][features[i]] * circleRadius;
-    }
     document.getElementById("selection").style.transform = "scale(" + (windowWidth / testedWidth + 0.2) + ")";
     render(0);
     render(1);
@@ -47,7 +39,6 @@ var radialScale = d3.scaleLinear()
     .range([0, 250]);
 function updateData(feature, k, n) {
     diagramValues[n][feature] = k;
-    console.log(diagramValues);
     render(n);
 }
 function angleToCoordinate(angle, value) {
@@ -284,12 +275,7 @@ function keyListener(event) {
     }
 }
 function test() {
-    if (location.search) {
-        console.log(location.search);
-    }
-    else {
-        console.log("no");
-    }
+    console.log(diagramValues);
 }
 window.addEventListener("keydown", keyListener);
 window.addEventListener("keyup", keyListener);

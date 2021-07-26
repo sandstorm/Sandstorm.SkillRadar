@@ -11,10 +11,6 @@ let features = ["Softwarearchitektur", "Frontendentwicklung", "Backendentwicklun
 let diagramTitles = ["Skills", "Interests"];
 
 function adjustToWindowSize() {
-    for (let i = 0; i < features.length; i++) {
-        diagramValues[0][features[i]] = diagramValues[0][features[i]] / circleRadius;
-        diagramValues[1][features[i]] = diagramValues[1][features[i]] / circleRadius;
-    }
     const windowHeight = window.innerHeight;
     const windowWidth = window.innerWidth;
 
@@ -27,10 +23,6 @@ function adjustToWindowSize() {
     pointSize = circleRadius * 0.1;
     svgSize = circleRadius * 400;
     svgMid = svgSize / 2;
-    for (let i = 0; i < features.length; i++) {
-        diagramValues[0][features[i]] = diagramValues[0][features[i]] * circleRadius;
-        diagramValues[1][features[i]] = diagramValues[1][features[i]] * circleRadius;
-    }
     document.getElementById("selection").style.transform = "scale(" + (windowWidth / testedWidth + 0.2) + ")";
     render(0);
     render(1);
@@ -43,7 +35,6 @@ const radialScale = d3.scaleLinear()
 //updating diagram data to show
 function updateData(feature: string, k: number, n: number) {
     diagramValues[n][feature] = k;
-    console.log(diagramValues)
     render(n);
 }
 
@@ -287,7 +278,7 @@ function render(n: number) {
         }
 
     }
-    
+
     let line = d3.line()
         .x(d => d.x)
         .y(d => d.y);
@@ -320,8 +311,7 @@ function keyListener(event) {
     }
 }
 function test() {
-    if (location.search) { console.log(location.search) }
-    else { console.log("no") }
+    console.log(diagramValues)
 }
 window.addEventListener("keydown", keyListener);
 window.addEventListener("keyup", keyListener);

@@ -12,15 +12,15 @@
   }
 
   .svgContainer {
-    transform: scale(.6);
-    left: -19%;
-    top: -12%;
+    transform: scale(.5);
+    left: -22%;
+    top: -20%;
     position: absolute;
   }
   .svgContainer1 {
-    transform: scale(.6);
-    right: -19%;
-    top: -12%;
+    transform: scale(.5);
+    right: -22%;
+    top: -20%;
     position: absolute;
   }
 }
