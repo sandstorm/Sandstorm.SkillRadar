@@ -284,8 +284,9 @@ function render(n: number) {
         .y(d => d.y);
 
         let d = data;
-        
-        let color = "navy";
+        let colors = ["navy", "orange"]
+
+        let color = colors[n];
         let coordinates = getPathCoordinates(d);
         
     svg.append("path")

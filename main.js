@@ -255,7 +255,8 @@ function render(n) {
         .x(function (d) { return d.x; })
         .y(function (d) { return d.y; });
     var d = data;
-    var color = "navy";
+    var colors = ["navy", "orange"];
+    var color = colors[n];
     var coordinates = getPathCoordinates(d);
     svg.append("path")
         .datum(coordinates)
